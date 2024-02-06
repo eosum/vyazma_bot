@@ -1,28 +1,60 @@
 package main.core;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import main.constantdata.BookingTime;
+import main.constantdata.ServiceTime;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class Service {
-    private Long serviceId;
-    private String name;
-    private Date workingTimeStart;
-    private Date workingTimeEnd;
-    private String description;
-    private Long roomId;
-    private String employeePosition;
+    private String id;
+    private String type;
+    private ConcurrentHashMap<String, Set<String>> busySlots = new ConcurrentHashMap<>();
 
-    public Service(Long serviceId, String name, String description, Long roomId, String employeePosition) {
-        this.serviceId = serviceId;
-        this.name = name;
-        this.description = description;
-        this.roomId = roomId;
-        this.employeePosition = employeePosition;
+    public Service(String id, String type) {
+        this.id = id;
+        this.type = type;
+
+        fillBusySlots();
     }
+
+    private void fillBusySlots() {
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        busySlots.put(today.format(formatter), new HashSet<>());
+        busySlots.put(today.plusDays(1).format(formatter), new HashSet<>());
+        busySlots.put(today.plusDays(2).format(formatter), new HashSet<>());
+    }
+
+    public ArrayList<String> getAvailableDate() {
+        ArrayList<String> res = new ArrayList<>();
+
+        for (Map.Entry<String, Set<String>> i: busySlots.entrySet()) {
+            if (i.getValue().size() != 24) res.add(i.getKey());
+        }
+        Collections.sort(res);
+        return res;
+    }
+
+
+    public ArrayList<String> getAvailableHours(String date) {
+        Set<String> busyHours = busySlots.get(date);
+
+        return ServiceTime.hours.stream().filter(element -> !busyHours.contains(element)).sorted().collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public boolean addHour(String date, String hour) {
+        return busySlots.get(date).add(hour);
+    }
+
+    @Override
+    public String toString() {
+        return id + " - " + type;
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package main.database;
 
 import main.core.Room;
+import main.core.Service;
 import main.core.Task;
 import main.utils.Transformation;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,25 @@ public class DatabaseManager {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(roomId));
             ps.setInt(2, cardNumber);
+            //ps.setDate(3, Date.valueOf(date + " " + hour));
+            System.out.println(n);
+            n = ps.executeUpdate();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return n > 0;
+    }
+
+    public static boolean createTask(Long userId, String serviceId, String problemDescription, String date, String hour) {
+        int n = 0;
+        Integer cardNumber = getCardNumber(userId);
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "insert into tasks (service_id, card_number, problem_description, chosen_time, creation_time) values (?, ?, ?, '2020-03-15 08:00:00', '2020-03-15 08:00:00')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(serviceId));
+            ps.setInt(2, cardNumber);
+            ps.setString(3, problemDescription);
             //ps.setDate(3, Date.valueOf(date + " " + hour));
             System.out.println(n);
             n = ps.executeUpdate();
@@ -62,6 +82,8 @@ public class DatabaseManager {
         return n > 0;
     }
 
+
+
     public static ArrayList<Task> getRequests(Long userId) {
         try(Connection connection = DataSource.getConnection()) {
             Integer cardNumber = getCardNumber(userId);
@@ -94,11 +116,12 @@ public class DatabaseManager {
         return null;
     }
 
-    public static ResultSet getServicesNames() {
+    public static HashMap<String, Service> getServices() {
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select name from services";
+            String sql = "select service_id, name from services";
             PreparedStatement ps = connection.prepareStatement(sql);
-            return ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            return Transformation.transformServices(rs);
         }
         catch (SQLException e) {
             e.printStackTrace();

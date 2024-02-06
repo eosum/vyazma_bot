@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Time {
+public class BookingTime {
     private static Set<String> date;
     public static final Set<String> hours = new HashSet<>();
 

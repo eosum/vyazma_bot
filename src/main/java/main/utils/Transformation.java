@@ -74,4 +74,22 @@ public class Transformation {
         }
         return res;
     }
+
+    public static HashMap<String, Service> transformServices(ResultSet rs) {
+        HashMap<String, Service> res = new HashMap<>();
+
+        try {
+            while(rs.next()) {
+                res.put(rs.getString("service_id"),
+                        new Service(
+                                rs.getString("service_id"),
+                                rs.getString("name"))
+                );
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
 }

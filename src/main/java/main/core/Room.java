@@ -1,7 +1,6 @@
 package main.core;
 
-import main.constantdata.Time;
-import main.database.DatabaseManager;
+import main.constantdata.BookingTime;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -46,7 +45,7 @@ public class Room {
     public ArrayList<String> getAvailableHours(String date) {
         Set<String> busyHours = busySlots.get(date);
 
-        return Time.hours.stream().filter(element -> !busyHours.contains(element)).sorted().collect(Collectors.toCollection(ArrayList::new));
+        return BookingTime.hours.stream().filter(element -> !busyHours.contains(element)).sorted().collect(Collectors.toCollection(ArrayList::new));
     }
 
     public boolean addHour(String date, String hour) {
