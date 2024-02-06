@@ -53,7 +53,7 @@ public class DepartureApplication implements Command{
 
         UserCommandsStore.lastUserCommand.remove(user.getUserId());
 
-        String result = success ? "Ваш заявка успешно обработана. Ответ администрации придет в ближайшие сутки": "Ошибка в базе данных";
+        String result = success ? "Ваш заявка успешно обработана": "Ошибка в базе данных";
 
         return new SendMessage(user.getChatId(), result);
     }

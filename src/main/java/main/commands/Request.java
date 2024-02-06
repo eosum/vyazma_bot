@@ -17,7 +17,7 @@ public class Request implements Command{
         StringBuilder str = new StringBuilder();
         for (Task i : ans) {
             str.append(i);
-            str.append("\n");
+            str.append("\n\n");
         }
 
         UserCommandsStore.lastUserCommand.remove(userId);

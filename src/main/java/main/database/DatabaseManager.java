@@ -3,11 +3,11 @@ package main.database;
 import main.core.Room;
 import main.core.Service;
 import main.core.Task;
-import main.core.User;
 import main.utils.Transformation;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -34,11 +34,11 @@ public class DatabaseManager {
         int n = 0;
         Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "insert into bookings (room_id, card_number, start_time) values (?, ?, '2020-03-15')";
+            String sql = "insert into bookings (room_id, card_number, start_time) values (?, ?, ?)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(roomId));
             ps.setInt(2, cardNumber);
-            //ps.setDate(3, Date.valueOf(date + " " + hour));
+            ps.setTimestamp(3, Timestamp.valueOf(date + " " + hour));
             System.out.println(n);
             n = ps.executeUpdate();
         }
@@ -52,12 +52,13 @@ public class DatabaseManager {
         int n = 0;
         Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "insert into tasks (service_id, card_number, problem_description, chosen_time, creation_time) values (?, ?, ?, '2020-03-15 08:00:00', '2020-03-15 08:00:00')";
+            String sql = "insert into tasks (service_id, card_number, problem_description, chosen_time, creation_time) values (?, ?, ?, ?, ?)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, Integer.parseInt(serviceId));
             ps.setInt(2, cardNumber);
             ps.setString(3, problemDescription);
-            //ps.setDate(3, Date.valueOf(date + " " + hour));
+            ps.setTimestamp(4, Timestamp.valueOf(date + " " + hour));
+            ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
             System.out.println(n);
             n = ps.executeUpdate();
         }
@@ -88,9 +89,10 @@ public class DatabaseManager {
         int n = 0;
         try(Connection connection = DataSource.getConnection()) {
             Integer cardNumber = getCardNumber(userId);
-            String sql = "insert into departures (card_number, date) values (?, '2020-03-15')";
+            String sql = "insert into departures (card_number, date) values (?, ?)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1,cardNumber);
+            ps.setDate(2, Date.valueOf(date));
             n = ps.executeUpdate();
         }
         catch (SQLException e) {
@@ -181,7 +183,7 @@ public class DatabaseManager {
 
         try(Connection connection = DataSource.getConnection()) {
             String query = "insert into guests (name, surname, middle_name, passport_seria, passport_number, passport_organization, passport_date, passport_division_code) values" +
-                    "(?, ?, ?, ?, ?, ?, '2017-12-01', ?)";
+                    "(?, ?, ?, ?, ?, ?, '?', ?)";
             PreparedStatement ps = connection.prepareStatement(query);
             ps.setString(1, name[0]);
             ps.setString(2, name[1]);
@@ -189,8 +191,8 @@ public class DatabaseManager {
             ps.setString(4, passport[0]);
             ps.setString(5, passport[1]);
             ps.setString(6, guestData[2]);
-            //ps.setString(7, guestData[3]);
-            ps.setString(7, guestData[4]);
+            ps.setDate(7, Date.valueOf(guestData[3]));
+            ps.setString(8, guestData[4]);
 
             ps.executeUpdate();
         }
@@ -203,13 +205,17 @@ public class DatabaseManager {
 
     private static boolean createApplication(Long userId, Integer guestId, String[] params) {
         int n = 0;
+        Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
             String query = "insert into applications (card_number, guest_id, confirmation, date, start_time, end_time) values" +
-                    "(335082, ?, ?, '2024-02-03', '2024-02-04 10:00:00', '2024-02-04 16:00:00')";
+                    "(?, ?, ?, '2024-02-03', '2024-02-04 10:00:00', '2024-02-04 16:00:00')";
             PreparedStatement ps = connection.prepareStatement(query);
-           // ps.setString(1, userId);
-            ps.setInt(1, guestId);
-            ps.setBoolean(2, false);
+            ps.setInt(1, cardNumber);
+            ps.setInt(2, guestId);
+            ps.setBoolean(3, false);
+            ps.setTimestamp(4, Timestamp.valueOf(params[5]));
+            ps.setTimestamp(5, Timestamp.valueOf(params[6]));
+            ps.setTimestamp(6, Timestamp.valueOf(params[7]));
             n  = ps.executeUpdate();
         }
         catch (SQLException e) {

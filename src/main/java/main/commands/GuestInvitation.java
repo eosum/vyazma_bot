@@ -53,7 +53,7 @@ public class GuestInvitation implements Command {
 
         UserCommandsStore.lastUserCommand.remove(user.getUserId());
 
-        String result = success ? "Ваш запрос успешно обработан": "Ошибка в базе данных";
+        String result = success ? "Ваш запрос успешно обработан. Ответ администрации придет в ближайшие сутки": "Ошибка в базе данных";
 
         return new SendMessage(event.getMessage().getChatId().toString(), result);
     }
