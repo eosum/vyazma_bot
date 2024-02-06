@@ -1,41 +1,53 @@
 package main.commands;
 
+import main.core.User;
 import main.database.DatabaseManager;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public class DepartureApplication implements Command{
+    private User user;
     @Override
     public SendMessage execute(Update event) {
+        if (user == null) setUserSettings(event);
+        UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
+
         if (event.hasMessage()) return completeQuery(event);
-        return getAdditionInfo(event);
+        return getAdditionInfo();
     }
 
-    public SendMessage getAdditionInfo(Update event) {
-        Long userId = event.getCallbackQuery().getFrom().getId();
-        String chatId = String.valueOf(event.getCallbackQuery().getMessage().getChatId());
+    @Override
+    public void setUserSettings(Update event) {
+        if (event.hasCallbackQuery()) {
+            user = new User(
+                    event.getCallbackQuery().getFrom().getId(),
+                    String.valueOf(event.getCallbackQuery().getMessage().getChatId())
+            );
+        } else {
+            user = new User(
+                    event.getMessage().getFrom().getId(),
+                    String.valueOf(event.getMessage().getChatId())
+            );
+        }
+    }
 
-        UserCommandsStore.lastUserCommand.put(userId, this);
-
-        return new SendMessage(chatId, "Введите дату отъезда");
+    public SendMessage getAdditionInfo() {
+        return new SendMessage(user.getChatId(), "Введите дату отъезда");
     }
 
 
     public SendMessage completeQuery(Update event) {
-        Long userId = event.getMessage().getFrom().getId();
         String data = event.getMessage().getText();
 
         String[] param = data.split("\n");
 
-        boolean success = DatabaseManager.createDepartureApplication(userId, param[0]);
+        boolean success = DatabaseManager.createDepartureApplication(user.getUserId(), param[0]);
 
-        UserCommandsStore.lastUserCommand.remove(userId);
+        UserCommandsStore.lastUserCommand.remove(user.getUserId());
 
-        String result = "Ошибка в базе данных";
+        String result = success ? "Ваш запрос успешно обработан": "Ошибка в базе данных";
 
-        if(success) result = "Ваш запрос успешно обработан";
-
-        return new SendMessage(event.getMessage().getChatId().toString(), result);
+        return new SendMessage(user.getChatId(), result);
     }
 
 }

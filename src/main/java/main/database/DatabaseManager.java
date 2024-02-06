@@ -1,19 +1,51 @@
 package main.database;
 
+import main.core.Room;
 import main.core.Task;
 import main.utils.Transformation;
 import org.springframework.stereotype.Component;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 
 @Component
 public class DatabaseManager {
+
+    public static boolean createBooking(Long userId, String roomId, String date, String hour) {
+        int n = 0;
+        Integer cardNumber = getCardNumber(userId);
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "insert into bookings (room_id, card_number, start_time) values (?, ?, '2020-03-15')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, Integer.parseInt(roomId));
+            ps.setInt(2, cardNumber);
+            //ps.setDate(3, Date.valueOf(date + " " + hour));
+            System.out.println(n);
+            n = ps.executeUpdate();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return n > 0;
+    }
+
+    public static HashMap<String, Room> getRooms() {
+
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select rooms.room_id, room_types.type from rooms\n" +
+                    "join room_types on room_types.type_id = rooms.type_id\n" +
+                    "where rooms.type_id != 2 and rooms.type_id != 7;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            return Transformation.transformRooms(rs);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static boolean createDepartureApplication(Long userId, String date) {
         int n = 0;
@@ -146,5 +178,4 @@ public class DatabaseManager {
 
         return n > 0;
     }
-
 }

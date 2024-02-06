@@ -1,11 +1,13 @@
 package main.utils;
 
+import main.core.Room;
 import main.core.Service;
 import main.core.Task;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Transformation {
@@ -52,6 +54,24 @@ public class Transformation {
             e.printStackTrace();
         }
 
+        return res;
+    }
+
+    public static HashMap<String, Room> transformRooms(ResultSet rs) {
+        HashMap<String, Room> res = new HashMap<>();
+
+        try {
+            while(rs.next()) {
+                res.put(rs.getString("room_id"),
+                        new Room(
+                            rs.getString("room_id"),
+                            rs.getString("type"))
+                );
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         return res;
     }
 }
