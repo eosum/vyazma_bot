@@ -1,6 +1,6 @@
 package main.commands;
 
-import main.constantdata.RoomsList;
+import main.constantdata.BookingConstData;
 import main.core.Room;
 import main.core.User;
 import main.database.DatabaseManager;
@@ -22,7 +22,7 @@ public class Booking implements Command{
     private String hour;
 
     public Booking() {
-        rooms = RoomsList.rooms;
+        rooms = BookingConstData.rooms;
     }
 
     public ArrayList<String> getRoomsDescription() {
@@ -101,8 +101,13 @@ public class Booking implements Command{
 
         UserCommandsStore.lastUserCommand.remove(user.getUserId());
 
-        String result = success ? "Ваш запрос успешно обработан": "Ошибка в базе данных";
+        String result = success ? getApprovedMessage(): "Ошибка в базе данных";
 
         return new SendMessage(user.getChatId(), result);
+    }
+
+    private String getApprovedMessage() {
+        return "Ваше бронирование оформлено.\nДетали бронирования:\nКомната: " +
+                rooms.get(roomId).toString() + "\nДата и время: " + date + " " + hour;
     }
 }

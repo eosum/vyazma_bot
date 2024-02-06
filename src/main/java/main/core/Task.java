@@ -17,8 +17,8 @@ public class Task {
     @Override
     public String toString() {
         return "serviceId = " + serviceId +
-                "\n problemDescription='" + problemDescription +
-                "\n chosenTime = " + chosenTime +
-                "\n creationTime = " + creationTime;
+                "\nОписание проблемы: " + problemDescription +
+                "\nВыбранное время и дата: " + chosenTime +
+                "\nДата создания заявки: " + creationTime;
     }
 }

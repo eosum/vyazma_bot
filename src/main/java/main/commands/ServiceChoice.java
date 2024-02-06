@@ -1,7 +1,6 @@
 package main.commands;
 
-import main.constantdata.ServicesList;
-import main.core.Room;
+import main.constantdata.ServicesConstData;
 import main.core.Service;
 import main.core.User;
 import main.database.DatabaseManager;
@@ -26,7 +25,7 @@ public class ServiceChoice implements Command {
 
 
     public ServiceChoice() {
-        services = ServicesList.services;
+        services = ServicesConstData.services;
     }
 
     public ArrayList<String> getServiceDescription() {

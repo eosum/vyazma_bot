@@ -1,7 +1,6 @@
 package main.core;
 
-import main.constantdata.BookingTime;
-import main.constantdata.ServiceTime;
+import main.constantdata.ServicesConstData;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +43,7 @@ public class Service {
     public ArrayList<String> getAvailableHours(String date) {
         Set<String> busyHours = busySlots.get(date);
 
-        return ServiceTime.hours.stream().filter(element -> !busyHours.contains(element)).sorted().collect(Collectors.toCollection(ArrayList::new));
+        return ServicesConstData.hours.stream().filter(element -> !busyHours.contains(element)).sorted().collect(Collectors.toCollection(ArrayList::new));
     }
 
     public boolean addHour(String date, String hour) {

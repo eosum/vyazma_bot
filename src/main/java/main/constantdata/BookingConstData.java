@@ -1,14 +1,19 @@
 package main.constantdata;
 
+import main.core.Room;
+import main.database.DatabaseManager;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BookingTime {
+public class BookingConstData {
     private static Set<String> date;
     public static final Set<String> hours = new HashSet<>();
+    public static final HashMap<String, Room> rooms = DatabaseManager.getRooms();
 
     static {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -16,18 +21,4 @@ public class BookingTime {
             hours.add(LocalTime.of(i, 0).format(formatter));
         }
     }
-
-    public static Set<String> getDate() {
-        date = new HashSet<>();
-
-        LocalDate today = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        date.add(today.format(formatter));
-        date.add(today.plusDays(1).format(formatter));
-        date.add(today.plusDays(2).format(formatter));
-
-        return date;
-    }
-
 }

@@ -3,6 +3,7 @@ package main.taskshandler;
 import main.bot.TelegramBot;
 import main.commands.Command;
 import main.commands.UserCommandsStore;
+import main.services.ValidationService;
 import main.utils.CommandFabric;
 import main.utils.CommandsUtils;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
@@ -36,7 +37,7 @@ public class TasksHandler implements Runnable{
                 Command lastCommand = UserCommandsStore.lastUserCommand.getOrDefault(userId, null);
                 Command resultCommand = command == null ? lastCommand : command;
 
-                if (resultCommand == null) {
+                if (resultCommand == null || !ValidationService.hasRights(userId)) {
                     bot.sendQueue.add(CommandsUtils.getErrorMessage(event.getMessage().getChatId()));
                     continue;
                 }

@@ -3,6 +3,7 @@ package main.database;
 import main.core.Room;
 import main.core.Service;
 import main.core.Task;
+import main.core.User;
 import main.utils.Transformation;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,22 @@ import java.util.HashMap;
 
 @Component
 public class DatabaseManager {
+
+    public static boolean hasUserPermission(Long user) {
+        long n = -1;
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select * from chats where user_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setLong(1, user);
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()) return false;
+            n = rs.getLong("user_id");
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return n > -1;
+    }
 
     public static boolean createBooking(Long userId, String roomId, String date, String hour) {
         int n = 0;
