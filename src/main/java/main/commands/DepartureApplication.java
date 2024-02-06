@@ -4,7 +4,7 @@ import main.database.DatabaseManager;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class GuestInvitation implements Command {
+public class DepartureApplication implements Command{
     @Override
     public SendMessage execute(Update event) {
         if (event.hasMessage()) return completeQuery(event);
@@ -17,7 +17,7 @@ public class GuestInvitation implements Command {
 
         UserCommandsStore.lastUserCommand.put(userId, this);
 
-        return new SendMessage(chatId, "Введите данные в заданном формате:\nФИО\nСерия и номер паспорта\nКем выдан\nКогда\nКод подразделения");
+        return new SendMessage(chatId, "Введите дату отъезда");
     }
 
 
@@ -27,7 +27,7 @@ public class GuestInvitation implements Command {
 
         String[] param = data.split("\n");
 
-        boolean success = DatabaseManager.createGuestApplication(userId, param);
+        boolean success = DatabaseManager.createDepartureApplication(userId, param[0]);
 
         UserCommandsStore.lastUserCommand.remove(userId);
 

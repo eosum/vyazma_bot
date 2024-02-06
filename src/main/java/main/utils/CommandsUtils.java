@@ -1,9 +1,6 @@
 package main.utils;
 
-import main.commands.Command;
-import main.commands.GuestInvitation;
-import main.commands.Request;
-import main.commands.Start;
+import main.commands.*;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.util.HashMap;
@@ -16,6 +13,7 @@ public class CommandsUtils {
         commands.put("Гостевой пропуск", new GuestInvitation());
         commands.put("/start", new Start());
         commands.put("Мои заявки", new Request());
+        commands.put("Оформление выезда", new DepartureApplication());
 
         return commands;
     }

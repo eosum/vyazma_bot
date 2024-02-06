@@ -9,16 +9,33 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component
 public class DatabaseManager {
+
+    public static boolean createDepartureApplication(Long userId, String date) {
+        int n = 0;
+        try(Connection connection = DataSource.getConnection()) {
+            Integer cardNumber = getCardNumber(userId);
+            String sql = "insert into departures (card_number, date) values (?, '2020-03-15')";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1,cardNumber);
+            n = ps.executeUpdate();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return n > 0;
+    }
+
     public static ArrayList<Task> getRequests(Long userId) {
         try(Connection connection = DataSource.getConnection()) {
             Integer cardNumber = getCardNumber(userId);
             String sql = "select * from tasks where card_number = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1,cardNumber);
+            ps.setInt(1,cardNumber);
             ResultSet rs = ps.executeQuery();
             return Transformation.transformRequests(rs);
         }
