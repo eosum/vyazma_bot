@@ -17,12 +17,12 @@ public class DatabaseManager {
     public static boolean hasUserPermission(Long user) {
         long n = -1;
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select * from chats where user_id = ?";
+            String sql = "select * from students where student_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setLong(1, user);
             ResultSet rs = ps.executeQuery();
             if (!rs.next()) return false;
-            n = rs.getLong("user_id");
+            n = rs.getLong("student_id");
         }
         catch(SQLException e) {
             e.printStackTrace();
@@ -214,8 +214,8 @@ public class DatabaseManager {
             ps.setInt(2, guestId);
             ps.setBoolean(3, false);
             ps.setTimestamp(4, Timestamp.valueOf(params[5]));
-            ps.setTimestamp(5, Timestamp.valueOf(params[6]));
-            ps.setTimestamp(6, Timestamp.valueOf(params[7]));
+            ps.setTime(5, Time.valueOf(params[6]));
+            ps.setTime(6, Time.valueOf(params[7]));
             n  = ps.executeUpdate();
         }
         catch (SQLException e) {
