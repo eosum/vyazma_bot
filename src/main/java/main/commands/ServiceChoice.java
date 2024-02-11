@@ -39,7 +39,7 @@ public class ServiceChoice implements Command {
 
     @Override
     public Object execute(Update event) {
-        if (user == null) setUserSettings(event);
+        if (user == null) user = setUserSettings(event);
         UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
         iterationNumber++;
         return switch (iterationNumber) {
@@ -50,21 +50,6 @@ public class ServiceChoice implements Command {
             case 5 -> makeBooking(event);
             default -> null;
         };
-    }
-
-    @Override
-    public void setUserSettings(Update event) {
-        if (event.hasCallbackQuery()) {
-            user = new User(
-                    event.getCallbackQuery().getFrom().getId(),
-                    String.valueOf(event.getCallbackQuery().getMessage().getChatId())
-            );
-        } else {
-            user = new User(
-                    event.getMessage().getFrom().getId(),
-                    String.valueOf(event.getMessage().getChatId())
-            );
-        }
     }
 
     private EditMessageReplyMarkup chooseService(Update event) {

@@ -15,7 +15,6 @@ public class CommandFabric {
         commands.put("Оформление выезда", this::getDepartureApplication);
         commands.put("Бронь комнаты", this::getBooking);
         commands.put("Выбор сервиса", this::getService);
-
     }
 
     public Command getCommand(String command) {

@@ -1,8 +1,10 @@
 package main.taskshandler;
 
+import lombok.Data;
 import main.bot.TelegramBot;
 import main.commands.Command;
 import main.commands.UserCommandsStore;
+import main.database.DatabaseManager;
 import main.services.ValidationService;
 import main.utils.CommandFabric;
 import main.utils.CommandsUtils;
@@ -37,7 +39,7 @@ public class TasksHandler implements Runnable{
                 Command lastCommand = UserCommandsStore.lastUserCommand.getOrDefault(userId, null);
                 Command resultCommand = command == null ? lastCommand : command;
 
-                if (resultCommand == null || !ValidationService.hasRights(userId)) {
+                if (resultCommand == null) {
                     bot.sendQueue.add(CommandsUtils.getErrorMessage(event.getMessage().getChatId()));
                     continue;
                 }

@@ -2,7 +2,7 @@ package main.constantdata;
 
 import java.util.ArrayList;
 
-public class StartButtonsName {
+public class StartStudentButtonsName {
     private static ArrayList<String> buttonsNames = new ArrayList<>();
 
     static {

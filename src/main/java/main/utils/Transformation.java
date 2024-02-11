@@ -11,22 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Transformation {
-    /*public List<Service> transformServicesToList(ResultSet res) throws SQLException {
-        List<Service> services = new ArrayList<>();
-        while (res.next()) {
-            Service service = new Service(
-                    res.getLong("service_id"),
-                    res.getString("name"),
-                    res.getString("description"),
-                    res.getLong("room_id"),
-                    res.getString("employee_position")
-            );
-
-            services.add(service);
-        }
-
-        return services;
-    }*/
 
     public List<String> transformServicesNamesToString(ResultSet res) throws SQLException {
         List<String> servicesName = new ArrayList<>();

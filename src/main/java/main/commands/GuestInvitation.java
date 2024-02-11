@@ -14,25 +14,10 @@ public class GuestInvitation implements Command {
     private User user;
     @Override
     public SendMessage execute(Update event) {
-        if (user == null) setUserSettings(event);
+        if (user == null) user = setUserSettings(event);
 
         if (event.hasMessage()) return completeQuery(event);
         return getAdditionInfo();
-    }
-
-    @Override
-    public void setUserSettings(Update event) {
-        if (event.hasCallbackQuery()) {
-            user = new User(
-                    event.getCallbackQuery().getFrom().getId(),
-                    String.valueOf(event.getCallbackQuery().getMessage().getChatId())
-            );
-        } else {
-            user = new User(
-                    event.getMessage().getFrom().getId(),
-                    String.valueOf(event.getMessage().getChatId())
-            );
-        }
     }
 
     private SendMessage getAdditionInfo() {

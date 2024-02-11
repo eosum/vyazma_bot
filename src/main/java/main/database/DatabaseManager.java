@@ -4,6 +4,7 @@ import main.core.Room;
 import main.core.Service;
 import main.core.Task;
 import main.utils.Transformation;
+import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
@@ -14,20 +15,35 @@ import java.util.HashMap;
 @Component
 public class DatabaseManager {
 
-    public static boolean hasUserPermission(Long user) {
+    public static String isStudentOrEmployee(Long userId) {
+        if (isEmployee(userId)) return "Сотрудник";
+        if (isStudent(userId)) return "Студент";
+        return null;
+    }
+
+    private static boolean isStudent(Long userId) {
+        String sqlStudent = "select * from students where student_id = ?";
+        System.out.println(userId);
+        return hasUser(userId, sqlStudent, "student_id") != null;
+    }
+
+    private static boolean isEmployee(Long userId) {
+        String sqlEmployee = "select * from employees where employee_id = ?";
+        return hasUser(userId, sqlEmployee, "employee_id") != null;
+    }
+
+    private static String hasUser(Long user, String sql, String columnName) {
         long n = -1;
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select * from students where student_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setLong(1, user);
             ResultSet rs = ps.executeQuery();
-            if (!rs.next()) return false;
-            n = rs.getLong("student_id");
+            if (rs.next()) n = rs.getLong(columnName);
         }
         catch(SQLException e) {
             e.printStackTrace();
         }
-        return n > -1;
+        return n > -1 ? "exist" : null;
     }
 
     public static boolean createBooking(Long userId, String roomId, String date, String hour) {
