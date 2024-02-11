@@ -1,5 +1,6 @@
 package main.database;
 
+import main.core.DeparturePersonInfo;
 import main.core.Room;
 import main.core.Service;
 import main.core.Task;
@@ -14,6 +15,22 @@ import java.util.HashMap;
 
 @Component
 public class DatabaseManager {
+
+    public static ArrayList<DeparturePersonInfo> getWhoHasLeft() {
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select students.room_id, departures.card_number, departures.date from departures\n" +
+                    "join students on students.card_id = departures.card_number\n" +
+                    "where departures.date = CURRENT_DATE;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            return Transformation.transformDeparturePersonInfo(rs);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static String isStudentOrEmployee(Long userId) {
         if (isEmployee(userId)) return "Сотрудник";
@@ -85,7 +102,6 @@ public class DatabaseManager {
     }
 
     public static HashMap<String, Room> getRooms() {
-
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select rooms.room_id, room_types.type from rooms\n" +
                     "join room_types on room_types.type_id = rooms.type_id\n" +

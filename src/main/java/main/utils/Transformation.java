@@ -1,5 +1,6 @@
 package main.utils;
 
+import main.core.DeparturePersonInfo;
 import main.core.Room;
 import main.core.Service;
 import main.core.Task;
@@ -12,13 +13,23 @@ import java.util.List;
 
 public class Transformation {
 
-    public List<String> transformServicesNamesToString(ResultSet res) throws SQLException {
-        List<String> servicesName = new ArrayList<>();
-        while (res.next()) {
-            servicesName.add(res.getString("name"));
+    public static ArrayList<DeparturePersonInfo> transformDeparturePersonInfo(ResultSet rs) {
+        ArrayList<DeparturePersonInfo> res = new ArrayList<>();
+
+        try {
+            while(rs.next()) {
+                res.add(new DeparturePersonInfo(
+                        rs.getString("date"),
+                        rs.getInt("card_number"),
+                        rs.getInt("room_id")
+                ));
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        return servicesName;
+        return res;
     }
 
     public static ArrayList<Task> transformRequests(ResultSet rs) {

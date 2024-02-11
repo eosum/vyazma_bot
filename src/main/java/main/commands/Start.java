@@ -55,7 +55,7 @@ public class Start implements Command {
         EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new TwoButtonsRowKeyboard(buttons).getMarkup());
 
-
+        UserCommandsStore.lastUserCommand.remove(user.getUserId());
         return newKb;
     }
 }
