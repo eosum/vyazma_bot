@@ -13,6 +13,73 @@ import java.util.HashMap;
 @Component
 public class DatabaseManager {
 
+    public static Long chatIdByCardNumber(Integer cardNumber) {
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select student_id from students where card_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setLong(1, cardNumber);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getLong("student_id");
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static boolean confirmApplications() {
+        int n = 0;
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "update applications\n" +
+                    "set confirmation = true\n" +
+                    "where confirmation = false";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            n = ps.executeUpdate();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return n > 0;
+    }
+
+    public static boolean hasRights(Long userId, String role) {
+        String realRole = "";
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select employees.position from employees\n" +
+                    "where employees.employee_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()) {
+               realRole  = rs.getString("position");
+            }
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return realRole.equals(role);
+    }
+
+    public static ArrayList<Application> getApplicationWaitingForConfirmation() {
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select a.card_number, a.date, a.start_time, a.end_time, g.name, g.surname, g.middle_name,\n" +
+                    "g.passport_seria, g.passport_number, g.passport_organization, g.passport_date, g.passport_division_code from applications a\n" +
+                    "join guests g on g.guest_id = a.guest_id\n" +
+                    "where a.confirmation = false;\n";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            return Transformation.transformApplications(rs);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public static ArrayList<EmployeeTask> getTasks(Long userId) {
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select tt.problem_description, tt.chosen_time, tt.card_number, students.room_id from taken_tasks tt\n" +

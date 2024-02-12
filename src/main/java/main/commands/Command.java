@@ -1,10 +1,13 @@
 package main.commands;
 
 import main.core.User;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 public interface Command{
-    Object execute(Update event);
+    default  Object execute(Update event) {
+        return new SendMessage(event.getMessage().getChatId().toString(), "Скоро тут появится функционал");
+    }
 
     default User setUserSettings(Update event) {
         if (event.hasCallbackQuery()) {

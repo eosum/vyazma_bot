@@ -9,6 +9,9 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class ValidationService {
+    public static boolean hasRights(Long userId, String role) {
+        return DatabaseManager.hasRights(userId, role);
+    }
 
     public static boolean checkDateFormat(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

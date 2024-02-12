@@ -12,12 +12,14 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class TasksHandler implements Runnable{
-    private TelegramBot bot;
+    private static TelegramBot bot;
     private ExecutorService pool;
     private CommandFabric commandFabric;
 
@@ -53,6 +55,10 @@ public class TasksHandler implements Runnable{
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void massMailing(ArrayList<SendMessage> messages) {
+        bot.sendQueue.addAll(messages);
     }
 
 

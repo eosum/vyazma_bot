@@ -10,16 +10,50 @@ import java.util.List;
 
 public class Transformation {
 
+    public static ArrayList<Application> transformApplications(ResultSet rs) {
+        ArrayList<Application> res = new ArrayList<>();
+        try {
+            while(rs.next()) {
+                Passport passport = new Passport(
+                    rs.getString("passport_seria"),
+                    rs.getString("passport_number"),
+                    rs.getString("passport_organization"),
+                    rs.getDate("passport_date"),
+                    rs.getString("passport_division_code")
+                );
+
+                Guest guest = new Guest(
+                        rs.getString("name"),
+                        rs.getString("middle_name"),
+                        rs.getString("surname"),
+                        passport
+                );
+
+                res.add(new Application(
+                        guest,
+                        rs.getInt("card_number"),
+                        rs.getString("start_time"),
+                        rs.getString("end_time"),
+                        rs.getString("date")
+                ));
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
     public static ArrayList<EmployeeTask> transformEmployeeTask(ResultSet rs) {
         ArrayList<EmployeeTask> res = new ArrayList<>();
 
         try {
             while(rs.next()) {
                 res.add(new EmployeeTask(
-                        rs.getString("problem_description"),
-                        rs.getTimestamp("chosen_time"),
                         rs.getInt("room_id"),
-                        rs.getInt("card_number")
+                        rs.getInt("card_number"),
+                        rs.getString("problem_description"),
+                        rs.getTimestamp("chosen_time")
                 ));
             }
         }

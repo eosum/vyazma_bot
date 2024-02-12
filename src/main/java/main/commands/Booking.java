@@ -36,7 +36,7 @@ public class Booking implements Command{
     @Override
     public Object execute(Update event) {
         if (user == null) user = setUserSettings(event);
-        UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
+        UserCommandsStore.lastUserCommand.put(user.userId(), this);
         iterationNumber++;
         return switch (iterationNumber) {
             case 1 -> chooseRoom(event);
@@ -48,7 +48,7 @@ public class Booking implements Command{
     }
 
     private EditMessageReplyMarkup chooseRoom(Update event) {
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
         newKb.setReplyMarkup(new Keyboard(getRoomsDescription()).getMarkup());
 
         return newKb;
@@ -59,7 +59,7 @@ public class Booking implements Command{
 
         roomId = event.getCallbackQuery().getData().split(" - ")[0];
 
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(messageId).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new TwoButtonsRowKeyboard(rooms.get(roomId).getAvailableDate()).getMarkup());
 
         return newKb;
@@ -69,7 +69,7 @@ public class Booking implements Command{
         int messageId = event.getCallbackQuery().getMessage().getMessageId();
 
         date = event.getCallbackQuery().getData();
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(messageId).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new TwoButtonsRowKeyboard(rooms.get(roomId).getAvailableHours(date)).getMarkup());
 
         return newKb;
@@ -82,13 +82,13 @@ public class Booking implements Command{
             return new SendMessage(event.getMessage().getChatId().toString(), "Что - то пошло не так, попробуйте еще раз");
         }
 
-        boolean success = DatabaseManager.createBooking(user.getUserId(), roomId, date, hour);
+        boolean success = DatabaseManager.createBooking(user.userId(), roomId, date, hour);
 
-        UserCommandsStore.lastUserCommand.remove(user.getUserId());
+        UserCommandsStore.lastUserCommand.remove(user.userId());
 
         String result = success ? getApprovedMessage(): "Ошибка в базе данных";
 
-        return new SendMessage(user.getChatId(), result);
+        return new SendMessage(user.chatId(), result);
     }
 
     private String getApprovedMessage() {

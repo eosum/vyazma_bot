@@ -20,7 +20,7 @@ public class Start implements Command {
     @Override
     public Object execute(Update event) {
         if (user == null) user = setUserSettings(event);
-        UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
+        UserCommandsStore.lastUserCommand.put(user.userId(), this);
         iterationNumber++;
         return switch(iterationNumber) {
             case 1 -> whichRights(event);
@@ -41,8 +41,7 @@ public class Start implements Command {
         int messageId = event.getCallbackQuery().getMessage().getMessageId();
         String role = event.getCallbackQuery().getData();
 
-
-        String chosenRole = DatabaseManager.isStudentOrEmployee(user.getUserId());
+        String chosenRole = DatabaseManager.isStudentOrEmployee(user.userId());
 
         if (!role.equals(chosenRole)) return getErrorMessage(chatId);
 
@@ -52,10 +51,10 @@ public class Start implements Command {
         else buttons = StartEmployeeButtonsName.getButtonsNames();
 
 
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(messageId).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new TwoButtonsRowKeyboard(buttons).getMarkup());
 
-        UserCommandsStore.lastUserCommand.remove(user.getUserId());
+        UserCommandsStore.lastUserCommand.remove(user.userId());
         return newKb;
     }
 }

@@ -11,4 +11,8 @@ public class CommandsUtils {
     public static SendMessage getParamErrorMessage(String chatId) {
         return new SendMessage(chatId, "Ошибка в формате параметров. Попробуйте ввести еще раз.");
     }
+
+    public static SendMessage getRightsErrorMessage(Long chatId) {
+        return new SendMessage(String.valueOf(chatId), "У вас недостаточно прав для выполнения этой команды.");
+    }
 }

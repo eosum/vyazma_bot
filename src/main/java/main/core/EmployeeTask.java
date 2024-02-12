@@ -2,20 +2,12 @@ package main.core;
 
 import java.util.Date;
 
-public class EmployeeTask {
-
-    private Integer roomNumber;
-    private Integer cardNumber;
-    private String problemDescription;
-    private Date chosenTime;
-
-    public EmployeeTask(String problemDescription, Date chosenTime, Integer roomNumber, Integer cardNumber) {
-        this.problemDescription = problemDescription;
-        this.chosenTime = chosenTime;
-        this.roomNumber = roomNumber;
-        this.cardNumber = cardNumber;
-    }
-
+public record EmployeeTask(
+        Integer roomNumber,
+        Integer cardNumber,
+        String problemDescription,
+        Date chosenTime
+) {
     @Override
     public String toString() {
         return "Номер комнаты: " + roomNumber +
@@ -23,6 +15,4 @@ public class EmployeeTask {
                 "\nОписание проблемы: " + problemDescription +
                 "\nНомер карты студента: " + cardNumber;
     }
-
-
 }

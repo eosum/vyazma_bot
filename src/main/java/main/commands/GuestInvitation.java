@@ -21,9 +21,9 @@ public class GuestInvitation implements Command {
     }
 
     private SendMessage getAdditionInfo() {
-        UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
+        UserCommandsStore.lastUserCommand.put(user.userId(), this);
 
-        return new SendMessage(user.getChatId(), FORMAT_MESSAGE);
+        return new SendMessage(user.chatId(), FORMAT_MESSAGE);
     }
 
 
@@ -34,9 +34,9 @@ public class GuestInvitation implements Command {
         SendMessage error = validateInput(param);
         if (error != null) return error;
 
-        boolean success = DatabaseManager.createGuestApplication(user.getUserId(), param);
+        boolean success = DatabaseManager.createGuestApplication(user.userId(), param);
 
-        UserCommandsStore.lastUserCommand.remove(user.getUserId());
+        UserCommandsStore.lastUserCommand.remove(user.userId());
 
         String result = success ? "Ваш запрос успешно обработан. Ответ администрации придет в ближайшие сутки": "Ошибка в базе данных";
 
@@ -44,11 +44,11 @@ public class GuestInvitation implements Command {
     }
 
     private SendMessage validateInput(String[] param) {
-        if (param.length < ROW_COUNT) return CommandsUtils.getParamErrorMessage(user.getChatId());
+        if (param.length < ROW_COUNT) return CommandsUtils.getParamErrorMessage(user.chatId());
         if (!ValidationService.checkDateFormat(param[5]) ||
                 !ValidationService.checkTimeFormat(param[6]) ||
                 !ValidationService.checkTimeFormat(param[7])
-        ) return CommandsUtils.getParamErrorMessage(user.getChatId());
+        ) return CommandsUtils.getParamErrorMessage(user.chatId());
 
         return null;
     }

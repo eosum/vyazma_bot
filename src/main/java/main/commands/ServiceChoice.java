@@ -40,7 +40,7 @@ public class ServiceChoice implements Command {
     @Override
     public Object execute(Update event) {
         if (user == null) user = setUserSettings(event);
-        UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
+        UserCommandsStore.lastUserCommand.put(user.userId(), this);
         iterationNumber++;
         return switch (iterationNumber) {
             case 1 -> chooseService(event);
@@ -53,7 +53,7 @@ public class ServiceChoice implements Command {
     }
 
     private EditMessageReplyMarkup chooseService(Update event) {
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
         newKb.setReplyMarkup(new Keyboard(getServiceDescription()).getMarkup());
 
         return newKb;
@@ -64,7 +64,7 @@ public class ServiceChoice implements Command {
 
         serviceId = event.getCallbackQuery().getData().split(" - ")[0];
 
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(messageId).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new TwoButtonsRowKeyboard(services.get(serviceId).getAvailableDate()).getMarkup());
 
         return newKb;
@@ -74,7 +74,7 @@ public class ServiceChoice implements Command {
         int messageId = event.getCallbackQuery().getMessage().getMessageId();
 
         date = event.getCallbackQuery().getData();
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.getChatId()).messageId(messageId).build();
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new TwoButtonsRowKeyboard(services.get(serviceId).getAvailableHours(date)).getMarkup());
 
         return newKb;
@@ -86,19 +86,19 @@ public class ServiceChoice implements Command {
             return new SendMessage(event.getMessage().getChatId().toString(), "Что - то пошло не так, попробуйте еще раз");
         }
 
-        return new SendMessage(user.getChatId(), "Введите описание проблемы");
+        return new SendMessage(user.chatId(), "Введите описание проблемы");
     }
 
 
     private SendMessage makeBooking(Update event) {
         problemDescription = event.getMessage().getText();
 
-        boolean success = DatabaseManager.createTask(user.getUserId(), serviceId, problemDescription, date, hour);
+        boolean success = DatabaseManager.createTask(user.userId(), serviceId, problemDescription, date, hour);
 
-        UserCommandsStore.lastUserCommand.remove(user.getUserId());
+        UserCommandsStore.lastUserCommand.remove(user.userId());
 
         String result = success ? "Ваш запрос успешно обработан": "Ошибка в базе данных";
 
-        return new SendMessage(user.getChatId(), result);
+        return new SendMessage(user.chatId(), result);
     }
 }

@@ -15,14 +15,14 @@ public class DepartureApplication implements Command{
     @Override
     public SendMessage execute(Update event) {
         if (user == null) user = setUserSettings(event);
-        UserCommandsStore.lastUserCommand.put(user.getUserId(), this);
+        UserCommandsStore.lastUserCommand.put(user.userId(), this);
 
         if (event.hasMessage()) return completeQuery(event);
         return getAdditionInfo();
     }
 
     public SendMessage getAdditionInfo() {
-        return new SendMessage(user.getChatId(), FORMAT_MESSAGE);
+        return new SendMessage(user.chatId(), FORMAT_MESSAGE);
     }
 
 
@@ -34,18 +34,18 @@ public class DepartureApplication implements Command{
         SendMessage error = validateInput(param);
         if (error != null) return error;
 
-        boolean success = DatabaseManager.createDepartureApplication(user.getUserId(), param[0]);
+        boolean success = DatabaseManager.createDepartureApplication(user.userId(), param[0]);
 
-        UserCommandsStore.lastUserCommand.remove(user.getUserId());
+        UserCommandsStore.lastUserCommand.remove(user.userId());
 
         String result = success ? "Ваш заявка успешно обработана": "Ошибка в базе данных";
 
-        return new SendMessage(user.getChatId(), result);
+        return new SendMessage(user.chatId(), result);
     }
 
     private SendMessage validateInput(String[] param) {
         if (param.length < ROW_COUNT || !ValidationService.checkDateFormat(param[0]))
-            return CommandsUtils.getParamErrorMessage(user.getChatId());
+            return CommandsUtils.getParamErrorMessage(user.chatId());
 
         return null;
     }
