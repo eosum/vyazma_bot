@@ -2,7 +2,6 @@ package main.database;
 
 import main.core.*;
 import main.utils.Transformation;
-import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.*;
@@ -12,6 +11,21 @@ import java.util.HashMap;
 
 @Component
 public class DatabaseManager {
+    public static boolean addNews(Long userId, String header, String news) {
+        int n = 0;
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "insert into news (header, description, creator_id, date) values (?, ?, ?, CURRENT_DATE)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, header);
+            ps.setString(2, news);
+            ps.setLong(3, userId);
+            n = ps.executeUpdate();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return n > 0;
+    }
 
     public static Long chatIdByCardNumber(Integer cardNumber) {
         try(Connection connection = DataSource.getConnection()) {
@@ -31,9 +45,10 @@ public class DatabaseManager {
     public static boolean confirmApplications() {
         int n = 0;
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "update applications\n" +
-                    "set confirmation = true\n" +
-                    "where confirmation = false";
+            String sql = """
+                    update applications
+                    set confirmation = true
+                    where confirmation = false""";
             PreparedStatement ps = connection.prepareStatement(sql);
             n = ps.executeUpdate();
         }
@@ -65,10 +80,12 @@ public class DatabaseManager {
 
     public static ArrayList<Application> getApplicationWaitingForConfirmation() {
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select a.card_number, a.date, a.start_time, a.end_time, g.name, g.surname, g.middle_name,\n" +
-                    "g.passport_seria, g.passport_number, g.passport_organization, g.passport_date, g.passport_division_code from applications a\n" +
-                    "join guests g on g.guest_id = a.guest_id\n" +
-                    "where a.confirmation = false;\n";
+            String sql = """
+                    select a.card_number, a.date, a.start_time, a.end_time, g.name, g.surname, g.middle_name,
+                    g.passport_seria, g.passport_number, g.passport_organization, g.passport_date, g.passport_division_code from applications a
+                    join guests g on g.guest_id = a.guest_id
+                    where a.confirmation = false;
+                    """;
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             return Transformation.transformApplications(rs);
@@ -82,9 +99,10 @@ public class DatabaseManager {
 
     public static ArrayList<EmployeeTask> getTasks(Long userId) {
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select tt.problem_description, tt.chosen_time, tt.card_number, students.room_id from taken_tasks tt\n" +
-                    "join students on students.card_id = tt.card_number\n" +
-                    "where tt.employee_id = ?";
+            String sql = """
+                    select tt.problem_description, tt.chosen_time, tt.card_number, students.room_id from taken_tasks tt
+                    join students on students.card_id = tt.card_number
+                    where tt.employee_id = ?""";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
@@ -99,9 +117,10 @@ public class DatabaseManager {
 
     public static ArrayList<DeparturePersonInfo> getWhoHasLeft() {
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select students.room_id, departures.card_number, departures.date from departures\n" +
-                    "join students on students.card_id = departures.card_number\n" +
-                    "where departures.date = CURRENT_DATE;";
+            String sql = """
+                    select students.room_id, departures.card_number, departures.date from departures
+                    join students on students.card_id = departures.card_number
+                    where departures.date = CURRENT_DATE;""";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             return Transformation.transformDeparturePersonInfo(rs);
@@ -184,9 +203,10 @@ public class DatabaseManager {
 
     public static HashMap<String, Room> getRooms() {
         try(Connection connection = DataSource.getConnection()) {
-            String sql = "select rooms.room_id, room_types.type from rooms\n" +
-                    "join room_types on room_types.type_id = rooms.type_id\n" +
-                    "where rooms.type_id != 2 and rooms.type_id != 7;";
+            String sql = """
+                    select rooms.room_id, room_types.type from rooms
+                    join room_types on room_types.type_id = rooms.type_id
+                    where rooms.type_id != 2 and rooms.type_id != 7;""";
             PreparedStatement ps = connection.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             return Transformation.transformRooms(rs);

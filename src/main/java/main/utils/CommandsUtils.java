@@ -15,4 +15,8 @@ public class CommandsUtils {
     public static SendMessage getRightsErrorMessage(Long chatId) {
         return new SendMessage(String.valueOf(chatId), "У вас недостаточно прав для выполнения этой команды.");
     }
+
+    public static SendMessage getDatabaseError(Long chatId) {
+        return new SendMessage(String.valueOf(chatId), "Ошибка на стороне базы данных, попробуйте позже");
+    }
 }

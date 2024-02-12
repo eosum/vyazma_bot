@@ -1,12 +1,11 @@
 package main.utils;
 
 import main.commands.*;
-import main.core.Service;
 
 import java.util.HashMap;
 
 public class CommandFabric {
-    private HashMap<String, CreateObject> commands = new HashMap<>();
+    private final HashMap<String, CreateObject> commands = new HashMap<>();
 
     public CommandFabric() {
         commands.put("Гостевой пропуск", this::getGuestInvitation);
@@ -19,6 +18,7 @@ public class CommandFabric {
         commands.put("Мои задачи", this::getTasks);
         commands.put("Выбрать задачи", this::getChooseTasks);
         commands.put("Подтвердить гостя", this::getGuestApproving);
+        commands.put("Добавить новость", this::getPostNews);
     }
 
     public Command getCommand(String command) {
@@ -66,5 +66,7 @@ public class CommandFabric {
         return new GuestApproving();
     }
 
-
+    private PostNews getPostNews() {
+        return new PostNews();
+    }
 }

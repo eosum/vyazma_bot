@@ -20,8 +20,6 @@ public class Request implements Command{
             str.append("\n\n");
         }
 
-        UserCommandsStore.lastUserCommand.remove(userId);
-
         return new SendMessage(String.valueOf(event.getCallbackQuery().getMessage().getChatId()), str.toString());
     }
 }
