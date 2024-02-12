@@ -16,6 +16,7 @@ public class CommandFabric {
         commands.put("Бронь комнаты", this::getBooking);
         commands.put("Выбор сервиса", this::getService);
         commands.put("Просмотреть выехавших", this::getWhoHaveLeft);
+        commands.put("Мои задачи", this::getTasks);
     }
 
     public Command getCommand(String command) {
@@ -50,5 +51,11 @@ public class CommandFabric {
     private ViewingWhoHasLeft getWhoHaveLeft() {
         return new ViewingWhoHasLeft();
     }
+
+    private TasksChecking getTasks() {
+        return new TasksChecking();
+    }
+
+
 
 }

@@ -1,9 +1,6 @@
 package main.database;
 
-import main.core.DeparturePersonInfo;
-import main.core.Room;
-import main.core.Service;
-import main.core.Task;
+import main.core.*;
 import main.utils.Transformation;
 import org.springframework.http.converter.json.GsonBuilderUtils;
 import org.springframework.stereotype.Component;
@@ -15,6 +12,23 @@ import java.util.HashMap;
 
 @Component
 public class DatabaseManager {
+
+    public static ArrayList<EmployeeTask> getTasks(Long userId) {
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select tt.problem_description, tt.chosen_time, tt.card_number, students.room_id from taken_tasks tt\n" +
+                    "join students on students.card_id = tt.card_number\n" +
+                    "where tt.employee_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
+            return Transformation.transformEmployeeTask(rs);
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     public static ArrayList<DeparturePersonInfo> getWhoHasLeft() {
         try(Connection connection = DataSource.getConnection()) {

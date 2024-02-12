@@ -1,9 +1,6 @@
 package main.utils;
 
-import main.core.DeparturePersonInfo;
-import main.core.Room;
-import main.core.Service;
-import main.core.Task;
+import main.core.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,6 +9,26 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Transformation {
+
+    public static ArrayList<EmployeeTask> transformEmployeeTask(ResultSet rs) {
+        ArrayList<EmployeeTask> res = new ArrayList<>();
+
+        try {
+            while(rs.next()) {
+                res.add(new EmployeeTask(
+                        rs.getString("problem_description"),
+                        rs.getTimestamp("chosen_time"),
+                        rs.getInt("room_id"),
+                        rs.getInt("card_number")
+                ));
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return res;
+    }
 
     public static ArrayList<DeparturePersonInfo> transformDeparturePersonInfo(ResultSet rs) {
         ArrayList<DeparturePersonInfo> res = new ArrayList<>();
