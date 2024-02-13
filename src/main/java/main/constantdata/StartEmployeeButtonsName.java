@@ -7,13 +7,13 @@ public class StartEmployeeButtonsName {
 
     static {
         buttonsNames.add("Добавить новость");
-        buttonsNames.add("Выбрать задачи");
         buttonsNames.add("Подтвердить гостя");
-        buttonsNames.add("Мои задачи");
+        buttonsNames.add("Новые задачи");
+        buttonsNames.add("Завершенные задачи");
         buttonsNames.add("Просмотреть выехавших");
     }
 
-    public static ArrayList<String> getButtonsNames() {
+    public static ArrayList<String> getButtonsNames()  {
         return buttonsNames;
     }
 }

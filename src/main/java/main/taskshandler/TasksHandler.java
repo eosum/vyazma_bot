@@ -1,20 +1,14 @@
 package main.taskshandler;
 
-import lombok.Data;
 import main.bot.TelegramBot;
-import main.commands.Command;
-import main.commands.UserCommandsStore;
-import main.database.DatabaseManager;
-import main.services.ValidationService;
+import main.commands.common.Command;
+import main.commands.common.UserCommandsStore;
 import main.utils.CommandFabric;
 import main.utils.CommandsUtils;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

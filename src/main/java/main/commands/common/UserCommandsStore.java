@@ -1,4 +1,6 @@
-package main.commands;
+package main.commands.common;
+
+import main.commands.common.Command;
 
 import java.util.concurrent.ConcurrentHashMap;
 

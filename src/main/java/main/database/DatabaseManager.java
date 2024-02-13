@@ -11,6 +11,53 @@ import java.util.HashMap;
 
 @Component
 public class DatabaseManager {
+    public static boolean insertIntoCompletedTasks(String phoneNumber, Integer taskId) {
+        int n = 0;
+        Long employeeId = getEmployeeId(phoneNumber);
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "insert into completed_tasks (completed_task_id, employee_id) values (?, ?)";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, taskId);
+            ps.setLong(2, employeeId);
+
+            n = ps.executeUpdate();
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return n > 0;
+    }
+
+    private static Long getEmployeeId(String phoneNumber) {
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select employee_id from employees where phone_number = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, phoneNumber);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getLong("employee_id");
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public static boolean isCardBlocked(Long userId) {
+        Integer cardNumber = getCardNumber(userId);
+        try(Connection connection = DataSource.getConnection()) {
+            String sql = "select state from cards where card_id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, cardNumber);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getBoolean("state");
+        }
+        catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public static boolean addNews(Long userId, String header, String news) {
         int n = 0;
         try(Connection connection = DataSource.getConnection()) {
@@ -97,14 +144,14 @@ public class DatabaseManager {
         return null;
     }
 
-    public static ArrayList<EmployeeTask> getTasks(Long userId) {
+    public static ArrayList<EmployeeTask> getTasks() {
         try(Connection connection = DataSource.getConnection()) {
             String sql = """
-                    select tt.problem_description, tt.chosen_time, tt.card_number, students.room_id from taken_tasks tt
-                    join students on students.card_id = tt.card_number
-                    where tt.employee_id = ?""";
+                    select t.problem_description, t.chosen_time, t.card_number, students.room_id, services.employee_position from tasks t
+                    join students on students.card_id = t.card_number
+                    join services on services.service_id = t.service_id;
+                        """;
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, userId);
             ResultSet rs = ps.executeQuery();
             return Transformation.transformEmployeeTask(rs);
         }

@@ -1,5 +1,7 @@
-package main.commands;
+package main.commands.employee;
 
+import main.commands.common.Command;
+import main.commands.common.UserCommandsStore;
 import main.database.DatabaseManager;
 import main.services.ValidationService;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

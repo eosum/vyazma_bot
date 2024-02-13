@@ -1,5 +1,7 @@
-package main.commands;
+package main.commands.student;
 
+import main.commands.common.Command;
+import main.commands.common.UserCommandsStore;
 import main.core.User;
 import main.database.DatabaseManager;
 import main.services.ValidationService;
@@ -15,7 +17,7 @@ public class GuestInvitation implements Command {
     @Override
     public SendMessage execute(Update event) {
         if (user == null) user = setUserSettings(event);
-
+        if (ValidationService.isCardBlocked(user.userId())) return new SendMessage(user.chatId(), "Ваш пропуск заблокирован. Подойдите к заведующему общежитием");
         if (event.hasMessage()) return completeQuery(event);
         return getAdditionInfo();
     }
@@ -40,7 +42,7 @@ public class GuestInvitation implements Command {
 
         String result = success ? "Ваш запрос успешно обработан. Ответ администрации придет в ближайшие сутки": "Ошибка в базе данных";
 
-        return new SendMessage(event.getMessage().getChatId().toString(), result);
+        return new SendMessage(user.chatId(), result);
     }
 
     private SendMessage validateInput(String[] param) {

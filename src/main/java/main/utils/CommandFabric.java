@@ -1,11 +1,15 @@
 package main.utils;
 
-import main.commands.*;
+import main.commands.common.Command;
+import main.commands.common.Start;
+import main.commands.employee.*;
+import main.commands.student.*;
 
 import java.util.HashMap;
 
 public class CommandFabric {
     private final HashMap<String, CreateObject> commands = new HashMap<>();
+
 
     public CommandFabric() {
         commands.put("Гостевой пропуск", this::getGuestInvitation);
@@ -15,10 +19,10 @@ public class CommandFabric {
         commands.put("Бронь комнаты", this::getBooking);
         commands.put("Выбор сервиса", this::getService);
         commands.put("Просмотреть выехавших", this::getWhoHaveLeft);
-        commands.put("Мои задачи", this::getTasks);
-        commands.put("Выбрать задачи", this::getChooseTasks);
+        commands.put("Новые задачи", this::getTasks);
         commands.put("Подтвердить гостя", this::getGuestApproving);
         commands.put("Добавить новость", this::getPostNews);
+        commands.put("Завершенные задачи", this::getCompletedTask);
     }
 
     public Command getCommand(String command) {
@@ -58,15 +62,15 @@ public class CommandFabric {
         return new TasksChecking();
     }
 
-    private ChooseTask getChooseTasks() {
-        return new ChooseTask();
-    }
-
     private GuestApproving getGuestApproving() {
         return new GuestApproving();
     }
 
     private PostNews getPostNews() {
         return new PostNews();
+    }
+
+    private AddCompletedTasks getCompletedTask() {
+        return new AddCompletedTasks();
     }
 }

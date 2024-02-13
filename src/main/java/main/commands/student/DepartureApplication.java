@@ -1,5 +1,7 @@
-package main.commands;
+package main.commands.student;
 
+import main.commands.common.Command;
+import main.commands.common.UserCommandsStore;
 import main.core.User;
 import main.database.DatabaseManager;
 import main.services.ValidationService;
@@ -10,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import static main.constantdata.DepartureConstData.FORMAT_MESSAGE;
 import static main.constantdata.DepartureConstData.ROW_COUNT;
 
-public class DepartureApplication implements Command{
+public class DepartureApplication implements Command {
     private User user;
     @Override
     public SendMessage execute(Update event) {

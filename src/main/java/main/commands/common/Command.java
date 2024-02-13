@@ -1,4 +1,4 @@
-package main.commands;
+package main.commands.common;
 
 import main.core.User;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;

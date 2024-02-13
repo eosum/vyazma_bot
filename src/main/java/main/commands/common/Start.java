@@ -1,4 +1,4 @@
-package main.commands;
+package main.commands.common;
 
 import main.constantdata.EmployeeOrStudentButtons;
 import main.constantdata.StartEmployeeButtonsName;

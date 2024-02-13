@@ -1,60 +1,59 @@
-package main.commands;
+package main.commands.student;
 
-import main.constantdata.ServicesConstData;
-import main.core.Service;
+import main.commands.common.Command;
+import main.commands.common.UserCommandsStore;
+import main.constantdata.BookingConstData;
+import main.core.Room;
 import main.core.User;
 import main.database.DatabaseManager;
 import main.keyboards.Keyboard;
 import main.keyboards.TwoButtonsRowKeyboard;
+import main.services.ValidationService;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
-public class ServiceChoice implements Command {
-    private HashMap<String, Service> services;
+public class Booking implements Command {
+    private HashMap<String, Room> rooms;
     private int iterationNumber = 0;
-    private String serviceId;
     private User user;
+    private String roomId;
     private String date;
     private String hour;
-    private String problemDescription;
 
-
-    public ServiceChoice() {
-        services = ServicesConstData.services;
+    public Booking() {
+        rooms = BookingConstData.rooms;
     }
 
-    public ArrayList<String> getServiceDescription() {
+    public ArrayList<String> getRoomsDescription() {
         ArrayList<String> res = new ArrayList<>();
-        for (Service i: services.values()) {
+        for (Room i: rooms.values()) {
             res.add(i.toString());
         }
-        Collections.sort(res);
         return res;
     }
 
     @Override
     public Object execute(Update event) {
         if (user == null) user = setUserSettings(event);
+        if (ValidationService.isCardBlocked(user.userId())) return new SendMessage(user.chatId(), "Ваш пропуск заблокирован. Подойдите к заведующему общежитием");
         UserCommandsStore.lastUserCommand.put(user.userId(), this);
         iterationNumber++;
         return switch (iterationNumber) {
-            case 1 -> chooseService(event);
+            case 1 -> chooseRoom(event);
             case 2 -> getAvailableDates(event);
             case 3 -> getAvailableHours(event);
-            case 4 -> getProblemDescription(event);
-            case 5 -> makeBooking(event);
+            case 4 -> makeBooking(event);
             default -> null;
         };
     }
 
-    private EditMessageReplyMarkup chooseService(Update event) {
+    private EditMessageReplyMarkup chooseRoom(Update event) {
         EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
-        newKb.setReplyMarkup(new Keyboard(getServiceDescription()).getMarkup());
+        newKb.setReplyMarkup(new Keyboard(getRoomsDescription()).getMarkup());
 
         return newKb;
     }
@@ -62,10 +61,10 @@ public class ServiceChoice implements Command {
     private EditMessageReplyMarkup getAvailableDates(Update event) {
         int messageId = event.getCallbackQuery().getMessage().getMessageId();
 
-        serviceId = event.getCallbackQuery().getData().split(" - ")[0];
+        roomId = event.getCallbackQuery().getData().split(" - ")[0];
 
         EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
-        newKb.setReplyMarkup(new TwoButtonsRowKeyboard(services.get(serviceId).getAvailableDate()).getMarkup());
+        newKb.setReplyMarkup(new TwoButtonsRowKeyboard(rooms.get(roomId).getAvailableDate()).getMarkup());
 
         return newKb;
     }
@@ -75,30 +74,29 @@ public class ServiceChoice implements Command {
 
         date = event.getCallbackQuery().getData();
         EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
-        newKb.setReplyMarkup(new TwoButtonsRowKeyboard(services.get(serviceId).getAvailableHours(date)).getMarkup());
+        newKb.setReplyMarkup(new TwoButtonsRowKeyboard(rooms.get(roomId).getAvailableHours(date)).getMarkup());
 
         return newKb;
     }
 
-    public SendMessage getProblemDescription(Update event) {
+    private SendMessage makeBooking(Update event) {
         hour = event.getCallbackQuery().getData();
-        if (!services.get(serviceId).addHour(date, hour)) {
+
+        if (!rooms.get(roomId).addHour(date, hour)) {
             return new SendMessage(event.getMessage().getChatId().toString(), "Что - то пошло не так, попробуйте еще раз");
         }
 
-        return new SendMessage(user.chatId(), "Введите описание проблемы");
-    }
-
-
-    private SendMessage makeBooking(Update event) {
-        problemDescription = event.getMessage().getText();
-
-        boolean success = DatabaseManager.createTask(user.userId(), serviceId, problemDescription, date, hour);
+        boolean success = DatabaseManager.createBooking(user.userId(), roomId, date, hour);
 
         UserCommandsStore.lastUserCommand.remove(user.userId());
 
-        String result = success ? "Ваш запрос успешно обработан": "Ошибка в базе данных";
+        String result = success ? getApprovedMessage(): "Ошибка в базе данных";
 
         return new SendMessage(user.chatId(), result);
+    }
+
+    private String getApprovedMessage() {
+        return "Ваше бронирование оформлено.\nДетали бронирования:\nКомната: " +
+                rooms.get(roomId).toString() + "\nДата и время: " + date + " " + hour;
     }
 }
