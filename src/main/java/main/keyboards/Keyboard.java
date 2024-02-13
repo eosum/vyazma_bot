@@ -7,9 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Keyboard {
-    private InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
+    private final InlineKeyboardMarkup markup = new InlineKeyboardMarkup();
     ArrayList<String> buttonsNames;
-
 
     public Keyboard(ArrayList<String> buttonsNames) {
         this.buttonsNames = buttonsNames;

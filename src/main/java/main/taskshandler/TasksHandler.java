@@ -4,7 +4,6 @@ import main.bot.TelegramBot;
 import main.commands.common.Command;
 import main.commands.common.UserCommandsStore;
 import main.utils.CommandFabric;
-import main.utils.CommandsUtils;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -12,13 +11,15 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static main.constants.ErrorMessages.UNKNOWN_COMMAND;
+
 public class TasksHandler implements Runnable{
     private static TelegramBot bot;
-    private ExecutorService pool;
-    private CommandFabric commandFabric;
+    private final ExecutorService pool;
+    private final CommandFabric commandFabric;
 
-    public TasksHandler(TelegramBot bot) {
-        this.bot = bot;
+    public TasksHandler(TelegramBot obj) {
+        bot = obj;
         pool = Executors.newCachedThreadPool();
         commandFabric = new CommandFabric();
     }
@@ -32,11 +33,11 @@ public class TasksHandler implements Runnable{
                 Long userId = event.hasMessage() ? event.getMessage().getFrom().getId() : event.getCallbackQuery().getFrom().getId();
 
                 Command command = commandFabric.getCommand(text);
-                Command lastCommand = UserCommandsStore.lastUserCommand.getOrDefault(userId, null);
+                Command lastCommand = UserCommandsStore.lastUserCommand.getOrDefault(String.valueOf(userId), null);
                 Command resultCommand = command == null ? lastCommand : command;
 
                 if (resultCommand == null) {
-                    bot.sendQueue.add(CommandsUtils.getErrorMessage(event.getMessage().getChatId()));
+                    bot.sendQueue.add(new SendMessage(String.valueOf(event.getMessage().getChatId()), UNKNOWN_COMMAND.getError()));
                     continue;
                 }
 
@@ -46,7 +47,7 @@ public class TasksHandler implements Runnable{
                 });
             }
             catch (InterruptedException e) {
-                e.printStackTrace();
+                e.getMessage();
             }
         }
     }

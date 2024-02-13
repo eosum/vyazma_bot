@@ -1,18 +1,22 @@
 package main.services;
 
-import main.core.User;
 import main.database.DatabaseManager;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import static main.constants.ErrorMessages.INPUT_ERROR;
+import static main.constants.NumericConst.DEPARTURE_INPUT_ROWS;
+import static main.constants.NumericConst.GUEST_INPUT_ROWS;
+
 public class ValidationService {
-    public static boolean isCardBlocked(Long userId) {
+    public static boolean isCardBlocked(String userId) {
         return DatabaseManager.isCardBlocked(userId);
     }
-    public static boolean hasRights(Long userId, String role) {
+    public static boolean hasRights(String userId, String role) {
         return DatabaseManager.hasRights(userId, role);
     }
 
@@ -60,5 +64,16 @@ public class ValidationService {
             }
         }
         return cnt > 0;
+    }
+
+    public static boolean validateDepartureInput(String[] param) {
+        return param.length == DEPARTURE_INPUT_ROWS.getCount() && ValidationService.checkDateFormat(param[0]);
+    }
+
+    public static boolean validateGuestInput(String[] param) {
+        return param.length == GUEST_INPUT_ROWS.getCount() &&
+                ValidationService.checkDateFormat(param[5]) &&
+                ValidationService.checkTimeFormat(param[6]) &&
+                ValidationService.checkTimeFormat(param[7]);
     }
 }

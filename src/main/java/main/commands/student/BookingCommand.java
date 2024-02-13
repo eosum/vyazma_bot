@@ -2,7 +2,7 @@ package main.commands.student;
 
 import main.commands.common.Command;
 import main.commands.common.UserCommandsStore;
-import main.constantdata.BookingConstData;
+import main.constants.BookingConstData;
 import main.core.Room;
 import main.core.User;
 import main.database.DatabaseManager;
@@ -16,15 +16,18 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Booking implements Command {
-    private HashMap<String, Room> rooms;
+import static main.constants.ErrorMessages.BLOCKED_CARD;
+import static main.constants.ErrorMessages.DATABASE_ERROR;
+
+public class BookingCommand implements Command {
+    private final HashMap<String, Room> rooms;
     private int iterationNumber = 0;
     private User user;
     private String roomId;
     private String date;
     private String hour;
 
-    public Booking() {
+    public BookingCommand() {
         rooms = BookingConstData.rooms;
     }
 
@@ -39,8 +42,9 @@ public class Booking implements Command {
     @Override
     public Object execute(Update event) {
         if (user == null) user = setUserSettings(event);
-        if (ValidationService.isCardBlocked(user.userId())) return new SendMessage(user.chatId(), "Ваш пропуск заблокирован. Подойдите к заведующему общежитием");
+        if (ValidationService.isCardBlocked(user.userId())) return new SendMessage(user.chatId(), BLOCKED_CARD.getError());
         UserCommandsStore.lastUserCommand.put(user.userId(), this);
+
         iterationNumber++;
         return switch (iterationNumber) {
             case 1 -> chooseRoom(event);
@@ -52,7 +56,9 @@ public class Booking implements Command {
     }
 
     private EditMessageReplyMarkup chooseRoom(Update event) {
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
+        int messageId = event.getCallbackQuery().getMessage().getMessageId();
+
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new Keyboard(getRoomsDescription()).getMarkup());
 
         return newKb;
@@ -80,6 +86,8 @@ public class Booking implements Command {
     }
 
     private SendMessage makeBooking(Update event) {
+        UserCommandsStore.lastUserCommand.remove(user.userId());
+
         hour = event.getCallbackQuery().getData();
 
         if (!rooms.get(roomId).addHour(date, hour)) {
@@ -88,11 +96,8 @@ public class Booking implements Command {
 
         boolean success = DatabaseManager.createBooking(user.userId(), roomId, date, hour);
 
-        UserCommandsStore.lastUserCommand.remove(user.userId());
-
-        String result = success ? getApprovedMessage(): "Ошибка в базе данных";
-
-        return new SendMessage(user.chatId(), result);
+        if (!success) createErrorMessage(user.chatId(), DATABASE_ERROR.getError());
+        return new SendMessage(user.chatId(), getApprovedMessage());
     }
 
     private String getApprovedMessage() {

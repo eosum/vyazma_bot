@@ -2,7 +2,8 @@ package main.commands.student;
 
 import main.commands.common.Command;
 import main.commands.common.UserCommandsStore;
-import main.constantdata.ServicesConstData;
+import main.constants.ErrorMessages;
+import main.constants.ServicesConstData;
 import main.core.Service;
 import main.core.User;
 import main.database.DatabaseManager;
@@ -17,8 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class ServiceChoice implements Command {
-    private HashMap<String, Service> services;
+import static main.constants.ErrorMessages.DATABASE_ERROR;
+import static main.constants.StateInfo.SUCCESS;
+
+public class ServiceChoose implements Command {
+    private final HashMap<String, Service> services;
     private int iterationNumber = 0;
     private String serviceId;
     private User user;
@@ -27,7 +31,7 @@ public class ServiceChoice implements Command {
     private String problemDescription;
 
 
-    public ServiceChoice() {
+    public ServiceChoose() {
         services = ServicesConstData.services;
     }
 
@@ -43,7 +47,9 @@ public class ServiceChoice implements Command {
     @Override
     public Object execute(Update event) {
         if (user == null) user = setUserSettings(event);
-        if (ValidationService.isCardBlocked(user.userId())) return new SendMessage(user.chatId(), "Ваш пропуск заблокирован. Подойдите к заведующему общежитием");
+
+        if (ValidationService.isCardBlocked(user.userId()))
+            return createErrorMessage(user.chatId(), ErrorMessages.BLOCKED_CARD.getError());
 
         UserCommandsStore.lastUserCommand.put(user.userId(), this);
         iterationNumber++;
@@ -58,7 +64,9 @@ public class ServiceChoice implements Command {
     }
 
     private EditMessageReplyMarkup chooseService(Update event) {
-        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(event.getCallbackQuery().getMessage().getMessageId()).build();
+        int messageId = event.getCallbackQuery().getMessage().getMessageId();
+
+        EditMessageReplyMarkup newKb = EditMessageReplyMarkup.builder().chatId(user.chatId()).messageId(messageId).build();
         newKb.setReplyMarkup(new Keyboard(getServiceDescription()).getMarkup());
 
         return newKb;
@@ -96,14 +104,12 @@ public class ServiceChoice implements Command {
 
 
     private SendMessage makeBooking(Update event) {
+        UserCommandsStore.lastUserCommand.remove(user.userId());
         problemDescription = event.getMessage().getText();
 
         boolean success = DatabaseManager.createTask(user.userId(), serviceId, problemDescription, date, hour);
 
-        UserCommandsStore.lastUserCommand.remove(user.userId());
-
-        String result = success ? "Ваш запрос успешно обработан": "Ошибка в базе данных";
-
-        return new SendMessage(user.chatId(), result);
+        if(!success) createErrorMessage(user.chatId(), DATABASE_ERROR.getError());
+        return new SendMessage(user.chatId(), SUCCESS.getState());
     }
 }

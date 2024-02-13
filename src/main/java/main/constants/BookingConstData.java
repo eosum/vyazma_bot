@@ -1,4 +1,4 @@
-package main.constantdata;
+package main.constants;
 
 import main.core.Room;
 import main.database.DatabaseManager;

@@ -1,6 +1,6 @@
 package main.core;
 
-import main.constantdata.ServicesConstData;
+import main.constants.ServicesConstData;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

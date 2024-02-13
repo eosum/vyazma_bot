@@ -12,14 +12,18 @@ public interface Command{
     default User setUserSettings(Update event) {
         if (event.hasCallbackQuery()) {
             return new User(
-                    event.getCallbackQuery().getFrom().getId(),
+                    String.valueOf(event.getCallbackQuery().getFrom().getId()),
                     String.valueOf(event.getCallbackQuery().getMessage().getChatId())
             );
         }
 
         return new User(
-                event.getMessage().getFrom().getId(),
+                String.valueOf(event.getMessage().getFrom().getId()),
                 String.valueOf(event.getMessage().getChatId())
         );
+    }
+
+    default SendMessage createErrorMessage(String chatId, String error) {
+        return new SendMessage(chatId, error);
     }
 }

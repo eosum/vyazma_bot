@@ -1,9 +1,8 @@
-package main.constantdata;
+package main.constants;
 
 import main.core.Service;
 import main.database.DatabaseManager;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;

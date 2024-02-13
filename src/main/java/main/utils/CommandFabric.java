@@ -4,25 +4,25 @@ import main.commands.common.Command;
 import main.commands.common.Start;
 import main.commands.employee.*;
 import main.commands.student.*;
+import static main.constants.ButtonNames.*;
 
 import java.util.HashMap;
 
 public class CommandFabric {
     private final HashMap<String, CreateObject> commands = new HashMap<>();
 
-
     public CommandFabric() {
-        commands.put("Гостевой пропуск", this::getGuestInvitation);
-        commands.put("/start", this::getStart);
-        commands.put("Мои заявки", this::getRequest);
-        commands.put("Оформление выезда", this::getDepartureApplication);
-        commands.put("Бронь комнаты", this::getBooking);
-        commands.put("Выбор сервиса", this::getService);
-        commands.put("Просмотреть выехавших", this::getWhoHaveLeft);
-        commands.put("Новые задачи", this::getTasks);
-        commands.put("Подтвердить гостя", this::getGuestApproving);
-        commands.put("Добавить новость", this::getPostNews);
-        commands.put("Завершенные задачи", this::getCompletedTask);
+        commands.put(START.getName(), this::getStart);
+        commands.put(GUEST_PASS.getName(), this::getGuestInvitation);
+        commands.put(APPLICATIONS.getName(), this::getApplications);
+        commands.put(DEPARTURE_REGISTRATION.getName(), this::getDepartureRegistration);
+        commands.put(BOOKING.getName(), this::getBooking);
+        commands.put(SERVICE_CHOOSE.getName(), this::getServiceChoose);
+        commands.put(WHO_HAS_LEFT.getName(), this::getWhoHaveLeft);
+        commands.put(NEW_TASKS.getName(), this::getNewTasks);
+        commands.put(APPROVE_GUEST.getName(), this::getApproveGuest);
+        commands.put(ADD_NEWS.getName(), this::getAddNews);
+        commands.put(COMPLETED_TASKS.getName(), this::getCompletedTask);
     }
 
     public Command getCommand(String command) {
@@ -30,20 +30,20 @@ public class CommandFabric {
         return commands.get(command).getCommand();
     }
 
-    private ServiceChoice getService() {
-        return new ServiceChoice();
+    private ServiceChoose getServiceChoose() {
+        return new ServiceChoose();
     }
 
-    private Booking getBooking() {
-        return new Booking();
+    private BookingCommand getBooking() {
+        return new BookingCommand();
     }
 
-    private Request getRequest() {
-        return new Request();
+    private ApplicationsCheck getApplications() {
+        return new ApplicationsCheck();
     }
 
-    private DepartureApplication getDepartureApplication() {
-        return new DepartureApplication();
+    private DepartureRegistration getDepartureRegistration() {
+        return new DepartureRegistration();
     }
 
     private GuestInvitation getGuestInvitation() {
@@ -54,23 +54,23 @@ public class CommandFabric {
         return new Start();
     }
 
-    private ViewingWhoHasLeft getWhoHaveLeft() {
-        return new ViewingWhoHasLeft();
+    private WhoHasLeftCheck getWhoHaveLeft() {
+        return new WhoHasLeftCheck();
     }
 
-    private TasksChecking getTasks() {
-        return new TasksChecking();
+    private NewTasksCheckCommand getNewTasks() {
+        return new NewTasksCheckCommand();
     }
 
-    private GuestApproving getGuestApproving() {
-        return new GuestApproving();
+    private ApproveGuestCommand getApproveGuest() {
+        return new ApproveGuestCommand();
     }
 
-    private PostNews getPostNews() {
-        return new PostNews();
+    private AddNewsCommand getAddNews() {
+        return new AddNewsCommand();
     }
 
-    private AddCompletedTasks getCompletedTask() {
-        return new AddCompletedTasks();
+    private CompletedTaskCommand getCompletedTask() {
+        return new CompletedTaskCommand();
     }
 }

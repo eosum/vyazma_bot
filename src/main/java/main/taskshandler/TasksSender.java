@@ -6,7 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageRe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class TasksSender implements Runnable{
-    private TelegramBot bot;
+    private final TelegramBot bot;
 
     public TasksSender(TelegramBot bot) {
         this.bot = bot;
@@ -24,7 +24,7 @@ public class TasksSender implements Runnable{
                 }
             }
             catch (InterruptedException | TelegramApiException e) {
-                e.printStackTrace();
+                e.getMessage();
             }
         }
     }

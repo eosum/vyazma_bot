@@ -23,7 +23,7 @@ public class DatabaseManager {
             n = ps.executeUpdate();
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > 0;
     }
@@ -38,11 +38,11 @@ public class DatabaseManager {
             return rs.getLong("employee_id");
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return null;
     }
-    public static boolean isCardBlocked(Long userId) {
+    public static boolean isCardBlocked(String userId) {
         Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select state from cards where card_id = ?";
@@ -53,38 +53,38 @@ public class DatabaseManager {
             return rs.getBoolean("state");
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return false;
     }
 
-    public static boolean addNews(Long userId, String header, String news) {
+    public static boolean addNews(String userId, String header, String news) {
         int n = 0;
         try(Connection connection = DataSource.getConnection()) {
             String sql = "insert into news (header, description, creator_id, date) values (?, ?, ?, CURRENT_DATE)";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, header);
             ps.setString(2, news);
-            ps.setLong(3, userId);
+            ps.setLong(3, Long.parseLong(userId));
             n = ps.executeUpdate();
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > 0;
     }
 
-    public static Long chatIdByCardNumber(Integer cardNumber) {
+    public static String chatIdByCardNumber(Integer cardNumber) {
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select student_id from students where card_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setLong(1, cardNumber);
             ResultSet rs = ps.executeQuery();
             rs.next();
-            return rs.getLong("student_id");
+            return String.valueOf(rs.getLong("student_id"));
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return null;
     }
@@ -100,18 +100,18 @@ public class DatabaseManager {
             n = ps.executeUpdate();
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > 0;
     }
 
-    public static boolean hasRights(Long userId, String role) {
+    public static boolean hasRights(String userId, String role) {
         String realRole = "";
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select employees.position from employees\n" +
                     "where employees.employee_id = ?";
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, userId);
+            ps.setLong(1, Long.parseLong(userId));
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()) {
@@ -119,7 +119,7 @@ public class DatabaseManager {
             }
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return realRole.equals(role);
@@ -138,10 +138,10 @@ public class DatabaseManager {
             return Transformation.transformApplications(rs);
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
     public static ArrayList<EmployeeTask> getTasks() {
@@ -156,7 +156,7 @@ public class DatabaseManager {
             return Transformation.transformEmployeeTask(rs);
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return null;
@@ -173,44 +173,44 @@ public class DatabaseManager {
             return Transformation.transformDeparturePersonInfo(rs);
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
-    public static String isStudentOrEmployee(Long userId) {
+    public static String isStudentOrEmployee(String userId) {
         if (isEmployee(userId)) return "Сотрудник";
         if (isStudent(userId)) return "Студент";
         return null;
     }
 
-    private static boolean isStudent(Long userId) {
+    private static boolean isStudent(String userId) {
         String sqlStudent = "select * from students where student_id = ?";
         System.out.println(userId);
         return hasUser(userId, sqlStudent, "student_id") != null;
     }
 
-    private static boolean isEmployee(Long userId) {
+    private static boolean isEmployee(String userId) {
         String sqlEmployee = "select * from employees where employee_id = ?";
         return hasUser(userId, sqlEmployee, "employee_id") != null;
     }
 
-    private static String hasUser(Long user, String sql, String columnName) {
+    private static String hasUser(String userId, String sql, String columnName) {
         long n = -1;
         try(Connection connection = DataSource.getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, user);
+            ps.setLong(1, Long.parseLong(userId));
             ResultSet rs = ps.executeQuery();
             if (rs.next()) n = rs.getLong(columnName);
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > -1 ? "exist" : null;
     }
 
-    public static boolean createBooking(Long userId, String roomId, String date, String hour) {
+    public static boolean createBooking(String userId, String roomId, String date, String hour) {
         int n = 0;
         Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
@@ -223,12 +223,12 @@ public class DatabaseManager {
             n = ps.executeUpdate();
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > 0;
     }
 
-    public static boolean createTask(Long userId, String serviceId, String problemDescription, String date, String hour) {
+    public static boolean createTask(String userId, String serviceId, String problemDescription, String date, String hour) {
         int n = 0;
         Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
@@ -243,7 +243,7 @@ public class DatabaseManager {
             n = ps.executeUpdate();
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > 0;
     }
@@ -259,13 +259,13 @@ public class DatabaseManager {
             return Transformation.transformRooms(rs);
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return null;
     }
 
-    public static boolean createDepartureApplication(Long userId, String date) {
+    public static boolean createDepartureApplication(String userId, String date) {
         int n = 0;
         try(Connection connection = DataSource.getConnection()) {
             Integer cardNumber = getCardNumber(userId);
@@ -276,14 +276,14 @@ public class DatabaseManager {
             n = ps.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return n > 0;
     }
 
 
 
-    public static ArrayList<Task> getRequests(Long userId) {
+    public static ArrayList<Task> getRequests(String userId) {
         try(Connection connection = DataSource.getConnection()) {
             Integer cardNumber = getCardNumber(userId);
             String sql = "select * from tasks where card_number = ?";
@@ -293,23 +293,23 @@ public class DatabaseManager {
             return Transformation.transformRequests(rs);
         }
         catch(SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
-        return null;
+        return new ArrayList<>();
     }
 
-    private static Integer getCardNumber(Long userId) {
+    private static Integer getCardNumber(String userId) {
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select card_id from students where (student_id = ?)";
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setLong(1, userId);
+            ps.setLong(1, Long.parseLong(userId));
             ResultSet res = ps.executeQuery();
             res.next();
             return res.getInt("card_id");
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return null;
@@ -323,13 +323,13 @@ public class DatabaseManager {
             return Transformation.transformServices(rs);
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return null;
     }
 
-    public static boolean createGuestApplication(Long userId, String[] params) {
+    public static boolean createGuestApplication(String userId, String[] params) {
         Integer guestId = getGuestId(params[1].split(" "));
 
         if (guestId == null) guestId = createGuest(params);
@@ -351,7 +351,7 @@ public class DatabaseManager {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return id;
@@ -377,13 +377,13 @@ public class DatabaseManager {
             ps.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return getGuestId(passport);
     }
 
-    private static boolean createApplication(Long userId, Integer guestId, String[] params) {
+    private static boolean createApplication(String userId, Integer guestId, String[] params) {
         int n = 0;
         Integer cardNumber = getCardNumber(userId);
         try(Connection connection = DataSource.getConnection()) {
@@ -399,7 +399,7 @@ public class DatabaseManager {
             n  = ps.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return n > 0;

@@ -1,6 +1,6 @@
 package main.core;
 
-import main.constantdata.BookingConstData;
+import main.constants.BookingConstData;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

@@ -39,7 +39,7 @@ public class Transformation {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return res;
     }
@@ -58,7 +58,7 @@ public class Transformation {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return res;
@@ -77,7 +77,7 @@ public class Transformation {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return res;
@@ -97,7 +97,7 @@ public class Transformation {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
 
         return res;
@@ -116,7 +116,7 @@ public class Transformation {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return res;
     }
@@ -134,7 +134,7 @@ public class Transformation {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            e.getMessage();
         }
         return res;
     }

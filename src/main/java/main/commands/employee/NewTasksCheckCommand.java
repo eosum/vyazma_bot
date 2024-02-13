@@ -1,30 +1,27 @@
 package main.commands.employee;
 
 import main.commands.common.Command;
-import main.commands.common.UserCommandsStore;
-import main.core.DeparturePersonInfo;
+import main.core.EmployeeTask;
 import main.database.DatabaseManager;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.ArrayList;
 
-public class ViewingWhoHasLeft implements Command {
+import static main.constants.StateInfo.NO_DATA;
 
+public class NewTasksCheckCommand implements Command {
     @Override
-    public SendMessage execute(Update event) {
-        Long userId = event.getCallbackQuery().getFrom().getId();
-        ArrayList<DeparturePersonInfo> ans = DatabaseManager.getWhoHasLeft();
+    public Object execute(Update event) {
+        ArrayList<EmployeeTask> ans = DatabaseManager.getTasks();
 
         StringBuilder str = new StringBuilder();
-        for (DeparturePersonInfo i : ans) {
+        for (EmployeeTask i : ans) {
             str.append(i);
             str.append("\n\n");
         }
 
-        if (str.isEmpty()) str = new StringBuilder("Новых заявок нет");
-
-        UserCommandsStore.lastUserCommand.remove(userId);
+        if (str.isEmpty()) str = new StringBuilder(NO_DATA.getState());
 
         return new SendMessage(String.valueOf(event.getCallbackQuery().getMessage().getChatId()), str.toString());
     }
