@@ -37,7 +37,7 @@ public class ApproveGuestCommand implements Command {
     }
 
     private void setUp(Update event) {
-        if (user == null) setUserSettings(event);
+        if (user == null) user = setUserSettings(event);
         UserCommandsStore.lastUserCommand.put(user.userId(), this);
     }
 

@@ -36,6 +36,8 @@ public class TasksHandler implements Runnable{
                 Command lastCommand = UserCommandsStore.lastUserCommand.getOrDefault(String.valueOf(userId), null);
                 Command resultCommand = command == null ? lastCommand : command;
 
+                System.out.println(text);
+
                 if (resultCommand == null) {
                     bot.sendQueue.add(new SendMessage(String.valueOf(event.getMessage().getChatId()), UNKNOWN_COMMAND.getError()));
                     continue;

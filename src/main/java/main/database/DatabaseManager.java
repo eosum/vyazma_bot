@@ -106,6 +106,7 @@ public class DatabaseManager {
     }
 
     public static boolean hasRights(String userId, String role) {
+        //System.out.println("KEEEEK");
         String realRole = "";
         try(Connection connection = DataSource.getConnection()) {
             String sql = "select employees.position from employees\n" +

@@ -18,7 +18,6 @@ public class AddNewsCommand implements Command {
     private User user;
     @Override
     public Object execute(Update event) {
-
         setUpCommand(event);
 
         iteration++;
@@ -30,7 +29,7 @@ public class AddNewsCommand implements Command {
     }
 
     private void setUpCommand(Update event) {
-        if(user == null) setUserSettings(event);
+        if(user == null) user = setUserSettings(event);
         UserCommandsStore.lastUserCommand.put(user.userId(), this);
     }
 
